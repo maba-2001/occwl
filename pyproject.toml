@@ -1,0 +1,16 @@
+[project]
+name = "occwl_maba"
+version = "3.0.0"
+authors = [
+  { name="Matteo Ballegeer", email="matteo.ballegeer@ugent.be" },
+]
+description = "Occwl Fork for Bending"
+readme = "README.md"
+requires-python = ">=3.9"
+
+[tool.conda]
+channels = ["conda-forge"]
+dependencies = [
+  "python>=3.9",
+  "libgl1-mesa-glx"
+]
