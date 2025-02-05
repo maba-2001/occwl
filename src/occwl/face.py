@@ -7,8 +7,8 @@ from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeFace
 from OCC.Core.BRepFill import BRepFill_Filling
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakePrism
-from OCC.Core.BRepTools import breptools_UVBounds
 from OCC.Core.BRepTopAdaptor import BRepTopAdaptor_FClass2d
+from OCC.Core.BRepTools import breptools
 from OCC.Core.GeomAbs import (GeomAbs_BezierSurface, GeomAbs_BSplineSurface,
                               GeomAbs_C0, GeomAbs_C1, GeomAbs_C2, GeomAbs_C3,
                               GeomAbs_Cone, GeomAbs_Cylinder, GeomAbs_G1,
@@ -27,7 +27,6 @@ from occwl.base import BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, 
     EdgeContainerMixin, VertexContainerMixin, SurfacePropertiesMixin
 from occwl.edge import Edge
 from occwl.shape import Shape
-
 import occwl.geometry.geom_utils as geom_utils
 import occwl.geometry.interval as Interval
 from occwl.geometry.box import Box
@@ -177,7 +176,7 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
             OCC.Geom.Handle_Geom_Surface: Interface to all surface geometry
         """
         loc = TopLoc_Location()
-        surf = BRep_Tool_Surface(self.topods_shape(), loc)
+        surf = BRep_Tool.Surface(self.topods_shape(), loc)
         if not loc.IsIdentity():
             tsf = loc.Transformation()
             np_tsf = geom_utils.to_numpy(tsf)
@@ -240,7 +239,7 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
             np.ndarray: 3D Point
         """
         loc = TopLoc_Location()
-        surf = BRep_Tool_Surface(self.topods_shape(), loc)
+        surf = BRep_Tool.Surface(self.topods_shape(), loc)
         pt = surf.Value(uv[0], uv[1])
         pt = pt.Transformed(loc.Transformation())
         return geom_utils.gp_to_numpy(pt)
@@ -256,7 +255,7 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
             Pair of np.ndarray or None: 3D unit vectors
         """
         loc = TopLoc_Location()
-        surf = BRep_Tool_Surface(self.topods_shape(), loc)
+        surf = BRep_Tool.Surface(self.topods_shape(), loc)
         dU, dV = gp_Dir(), gp_Dir()
         res = GeomLProp_SLProps(surf, uv[0], uv[1], 1, 1e-9)
         if res.IsTangentUDefined() and res.IsTangentVDefined():
@@ -277,7 +276,7 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
             np.ndarray: 3D unit normal vector
         """
         loc = TopLoc_Location()
-        surf = BRep_Tool_Surface(self.topods_shape(), loc)
+        surf = BRep_Tool.Surface(self.topods_shape(), loc)
         res = GeomLProp_SLProps(surf, uv[0], uv[1], 1, 1e-9)
         if not res.IsNormalDefined():
             return (0, 0, 0)
@@ -414,7 +413,7 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             Box: UV-domain bounds
         """
-        umin, umax, vmin, vmax = breptools_UVBounds(self.topods_shape())
+        umin, umax, vmin, vmax = breptools.UVBounds(self.topods_shape())
         bounds = Box(np.array([umin, vmin]))
         bounds.encompass_point(np.array([umax, vmax]))
         return bounds
@@ -430,7 +429,7 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
             np.ndarray: UV-coordinate
         """
         loc = TopLoc_Location()
-        surf = BRep_Tool_Surface(self.topods_shape(), loc)
+        surf = BRep_Tool.Surface(self.topods_shape(), loc)
         gp_pt = gp_Pnt(pt[0], pt[1], pt[2])
         inv = loc.Transformation().Inverted()
         gp_pt.Transformed(inv)

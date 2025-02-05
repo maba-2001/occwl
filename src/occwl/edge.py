@@ -1,7 +1,7 @@
 import numpy as np
 
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d, gp_Ax2, gp_Circ
-from OCC.Core.BRep import BRep_Tool, BRep_Tool_Curve, BRep_Tool_Continuity
+from OCC.Core.BRep import BRep_Tool, BRep_Tool_Continuity
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.BRepGProp import brepgprop_LinearProperties
 from OCC.Core.GC import GC_MakeArcOfCircle
@@ -227,7 +227,7 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
         Returns:
             OCC.Geom.Handle_Geom_Curve: Interface to all curve geometry
         """
-        return BRep_Tool_Curve(self.topods_shape())[0]
+        return BRep_Tool.Curve(self.topods_shape())[0]
 
     def specific_curve(self):
         """
@@ -278,7 +278,7 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
         if not self.has_curve():
             # Return an empty interval
             return Interval()
-        _, umin, umax = BRep_Tool_Curve(self.topods_shape())
+        _, umin, umax = BRep_Tool.Curve(self.topods_shape())
         return Interval(umin, umax)
 
     def reversed_edge(self):
